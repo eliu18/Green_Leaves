@@ -1,14 +1,13 @@
 angular.module('GreenLeaves', [])
     .controller('Form', function ($scope, $http) {
 
-        /* Form validate */
+        /* Form Validate */
         $scope.hideForm = false;
         $scope.modalStatusInvalid = {
             name: { status: true, msg: "" },
             email: { status: true, msg: "" },
             date: { status: true, msg: "" },
             telephone: { status: true, msg: "" },
-            city: { status: true, msg: "" }
         }
 
         $scope.submitForm = function submitForm() {
@@ -25,9 +24,6 @@ angular.module('GreenLeaves', [])
         $scope.isInputInvalid = function isInputInvalid(input, value) {
             switch (input) {
                 case 'name':
-                    return value ? false : true;
-
-                case 'city':
                     return value ? false : true;
 
                 case 'email':
@@ -57,19 +53,6 @@ angular.module('GreenLeaves', [])
                             break;
                         } else {
                             $scope.modalStatusInvalid[input]['msg'] = "El nombre no es valido";
-                            formStatus();
-                            break;
-                        }
-
-                    case 'city':
-                        regEx = /\w+/;
-                        if (value.match(regEx) && value.length > 2) {
-                            $scope.modalStatusInvalid[input]["status"] = false;
-                            $scope.modalStatusInvalid[input]['msg'] = "";
-                            formStatus();
-                            break;
-                        } else {
-                            $scope.modalStatusInvalid[input]['msg'] = "La ciudad no es valida";
                             formStatus();
                             break;
                         }
@@ -184,50 +167,46 @@ angular.module('GreenLeaves', [])
                 }
             }
 
-            if (statusForm === 15) {
+            if (statusForm === 12) {
                 $scope.submitted = false;
                 $scope.modal = false;
-                $scope.hideForm = true;
-                $scope.formResponse = true;
+                $scope.loadingSpinner = true;
+
+                setTimeout((function () {
+                    weather();
+                }), 2000);
             } else {
                 $scope.formStatus.unshift("Faltan datos")
                 $scope.modal = true;
             }
         }
-        /* Form validate */
+        /* Form Validate */
 
-
-
-
-        /* City API */
-        $scope.setCityRequest = function setCityRequest() {
-            if ($scope.city) {
-                if ($scope.city.length > 2) {
-                    let url = "http://api.geonames.org/searchJSON?name=" + $scope.city + "&maxRows=10&username=eliuj18"
-                    $http.get(url).then(function (response) {
-                        let cities = [];
-                        response["data"]["geonames"].forEach((element) => {
-                            if (element.toponymName && element.adminName1 && element.countryName) {
-                                cities.push(element.toponymName + "," + element.adminName1 + "," + element.countryName);
-                            }
-                        })
-                        $scope.cities = cities;
-                        $scope.cityList = true;
-
+        /* Clima API */
+        function weather() {
+            navigator.geolocation.getCurrentPosition((pos) => {
+                if (pos) {
+                    let lat = pos.coords.latitude;
+                    let lon = pos.coords.longitude;
+                    let weatherUrl = "http://api.openweathermap.org/data/2.5/weather?lat=" + lat + "&lon=" + lon + "&APPID=3e4180f3b57c6a1d0ed696aec88c2307";
+                    $http.get(weatherUrl).then(function (response) {
+                        let temp = response.data.main.temp
+                        let city = response.data.name;
+                        $scope.weather = kelvinDegreeToCelsius(temp);
+                        $scope.city = "en " + city;
+                        $scope.loadingSpinner = false;
+                        $scope.hideForm = true;
+                        $scope.formResponse = true;
                     });
-                } else {
-                    $scope.cityList = false;
                 }
-            }
+            })
         }
 
-        $scope.setInputCity = function setInputCity(citie) {
-            $scope.city = citie;
-            $scope.cityList = false;
+        function kelvinDegreeToCelsius(temp) {
+            return Math.round((temp - 273.15)) + "°C ";
         }
-        /* City API */
-
-
+        /* Clima API */
+        
         /* Calendar Widget */
         $scope.calendar = false;
         $scope.DAY_NAMES = ["Lu", "Ma", "Mi", "Ju", "Vi", "Sa", "Do"];
