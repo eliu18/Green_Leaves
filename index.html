@@ -1,0 +1,141 @@
+<html ng-app="GreenLeaves">
+
+<head>
+    <title>Green Leaves</title>
+    <link rel="stylesheet" href="./styles.css">
+    <script src="./node_modules/angular/angular.min.js"></script>
+    <script src="./main.js"></script>
+</head>
+
+<body ng-controller="Form">
+
+    <header>
+        <h1>Green Leaves</h1>
+        <figure><img src="./img/leave.png" alt="Img Not Found"></figure>
+    </header>
+
+    <!-- Form -->
+    <form name="form" ng-hide="hideForm" novalidate>
+        <table>
+            <tr>
+                <td> <strong>Nombre:</strong></td>
+                <td> <input ng-class="submitted && isInputInvalid('name',name)? 'input-error' : 'input' " type="text"
+                        name="name" ng-model="name" autocomplete="off" required /> <br /></td>
+            </tr>
+
+            <tr>
+                <td><strong>E-mail:</strong></td>
+                <td> <input ng-class="submitted && isInputInvalid('email',email)? 'input-error' : 'input' " type="text"
+                        name="email" ng-model="email" autocomplete="off" required /> <br /> </td>
+            </tr>
+
+            <tr>
+                <td><strong>Teléfono:</strong></td>
+                <td><input ng-class="submitted && isInputInvalid('telephone',telephone)? 'input-error' : 'input' "
+                        type="text" name="telephone" ng-model="telephone" autocomplete="off" required /> <br /></td>
+            </tr>
+
+            <tr>
+                <td><strong>Fecha:</strong></td>
+                <td align="left"><input
+                        ng-class="submitted && isInputInvalid('date',date)? 'date-input-error' : 'date-input' "
+                        type="text" name="date" ng-model="date" autocomplete="off" required /><img
+                        class="calendar-icon" src="./img/calendar-icon.png" alt="" ng-click="showCalendar()"></td>
+            </tr>
+
+            <tr>
+                <td> <strong>Ciudad y Estado:</strong></td>
+                <td><input type="text" ng-class="submitted && isInputInvalid('city',city)? 'input-error' : 'input' "
+                        name="city" ng-change="setCityRequest()" ng-model="city" autocomplete="off" required />
+                    <br /></td>
+            </tr>
+
+            <tr>
+                <td></td>
+                <td align="right"><input class="btn" type="submit" value="Enviar" ng-click="submitForm()" /> <br /></td>
+            </tr>
+
+        </table>
+    </form>
+    <!-- Form -->
+
+    <!-- Form-Response -->
+    <div ng-show="formResponse" class="formResponse-container">
+        <p>
+            Estimado <strong>{{name}}</strong>, <br><br>
+            Hemos recibido sus datos y nos pondremos en contacto con usted a la brevedad posible. Enviaremos <br>
+            un correo con informacion a su cuenta: <b><a href="">{{email}}</a></b>
+        </p>
+        <p class="formResponse-footer">
+            Atte. <br>
+            <strong class="formResponse-company">Green Leaves</strong> <br>
+            <i>
+                {{city}} a {{date}}
+            </i>
+        </p>
+    </div>
+    <!-- Form-Response -->
+
+    <!-- Cities -->
+    <ul class="cities-container" ng-show="cityList">
+        <li class="city" ng-repeat="citie in cities track by $index" ng-click="setInputCity(citie)">
+            &nbsp;&nbsp;{{citie}}</li>
+    </ul>
+    <!-- Cities -->
+
+    <!-- Calendar -->
+    <div class="calendar" ng-show="calendar">
+
+        <!-- Calendar Header -->
+        <div class="calendar-header">
+            <span class="calendar-arrow" id="prevArrow" ng-click="setPrevMonth()">&#8249;</span>
+            <div class="calendar-month-year">
+                {{month}} {{year}}
+            </div>
+            <span class="calendar-arrow" id="nextArrow" ng-click="setNextMonth()">&#8250;</span>
+        </div>
+
+        <!-- Calendar Day of Week -->
+        <div class="calendar-day" ng-repeat="dayName in DAY_NAMES track by $index">
+            {{dayName}}
+        </div>
+
+        <!-- Calendar Day of Month -->
+        <div class="calendar-body">
+            <div class="calendar-week" ng-repeat="weeks in calendarDays track by $index">
+                <div ng-class="styleOfDay(day)" ng-repeat="day in weeks track by $index" ng-click="setDate(day)">
+                    {{day}}
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Calendar -->
+
+    <!-- Modal -->
+    <div class="modal" ng-show="modal">
+        <div class="modal-child">
+
+            <div class="modal-header">
+                <h3>Contacto</h3>
+                <div class="modal-close-container">
+                    <a href="#" class="modal-close" ng-click="submitModal()">x</a>
+                </div>
+            </div>
+            <div class="modal-body">
+                <p>Se encontraron los siguientes errores en sus <br> datos de contacto:</p>
+                <ul class="modal-status">
+                    <li ng-repeat="inputStatus in formStatus">{{inputStatus}}</li>
+                </ul>
+                <p>Por favor corrija los errores para continuar</p>
+                <div class="modal-btn-container">
+                    <input class="btn" type="submit" value="Ok" ng-click="submitModal()">
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal -->
+
+
+</body>
+
+</html>
